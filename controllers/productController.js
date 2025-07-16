@@ -1,13 +1,15 @@
 
 const {sequelize} = require('../config/mysql');
 
-const Product = require('../writeModel/product')(sequelize);
+const writeProduct = require('../models/writeModel/product')(sequelize);
+const readProduct = require('../models/readModel/product');
+
 
 const getById = async (req,res)=>{
     try{
         const prodId=req.params.id;
 
-        const result= await Product.findByPk(prodId);
+        const result= await readProduct.findById(prodId);
         if(!result)
         {
             return res.status(404).json({status:"Not found"});
@@ -23,7 +25,7 @@ const getById = async (req,res)=>{
 const get = async(req,res) => {
 
     try{
-        const result=await Product.findAll();
+        const result=await readProduct.find();
         return res.status(200).json({result:result});
     }
     catch(error)
@@ -36,7 +38,9 @@ const get = async(req,res) => {
 const add = async (req, res) => {
   try {
     const body = req.body;
-    const result = await Product.create(body);
+    const result = await writeProduct.create(body);
+
+     await initiateReadEvent('products','create', result.id , result);
 
     return res.status(200).json({
       status: "Product added successfully",
@@ -47,7 +51,7 @@ const add = async (req, res) => {
     console.error(error);
     return res.status(500).json({ status: "Internal server error" });
   }
-};
+}
 
 const update = async (req, res) => {
   try {
@@ -70,7 +74,7 @@ const update = async (req, res) => {
     console.error(error);
     return res.status(500).json({ status: "Internal server error" });
   }
-};
+}
 
 
 
