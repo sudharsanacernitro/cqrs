@@ -4,8 +4,9 @@ const { redisClient } = require('../../config/redis');
 
 exports.initiateReadEvent = async (DBname, Command, DataId, DTO) => {
 
-    const topic = `${DBname}-${Command}`.toLowerCase();
-    const payload = JSON.stringify(DTO);
+    const topic = `CQRS`;
+    DTO._id=DataId;
+    const payload = JSON.stringify({DTO,DBname:DBname,Operation:Command});
     const headers = {
         'content-type': 'application/json',
         'correlation-id': String(DataId),

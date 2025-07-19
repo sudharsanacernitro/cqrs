@@ -2,8 +2,8 @@
 const {sequelize} = require('../config/mysql');
 
 const writeProduct = require('../models/writeModel/product')(sequelize);
-const readProduct = require('../models/readModel/product');
-
+const readProduct = require('../models/readmodel/product');
+const {initiateReadEvent}=require('../eventHandler/producer/eventEmitterHandler');
 
 const getById = async (req,res)=>{
     try{
@@ -40,7 +40,7 @@ const add = async (req, res) => {
     const body = req.body;
     const result = await writeProduct.create(body);
 
-     await initiateReadEvent('products','create', result.id , result);
+     await initiateReadEvent('products','create', result.id , body);
 
     return res.status(200).json({
       status: "Product added successfully",
